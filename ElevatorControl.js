@@ -47,15 +47,19 @@ class Elevator{
             closeDoors();
             this.position += 1;
             console.log(`Elevator-${this.name}: action: moving up to floor#${this.position}: OK`);
-            openDoors();
-        }
+            if(this.destinationFloor === this.position){
+                openDoors();
+            }
+         }
     }
     moveDown(){
         if(this.position > minFloor){
             closeDoors();
             this.position -= 1;
             console.log(`Elevator-${this.name}: action: moving down to floor#${this.position}: OK`);
-            openDoors();
+            if(this.destinationFloor === this.position){
+                openDoors();
+            }
         }
     }
     move(floor){
