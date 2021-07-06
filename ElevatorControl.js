@@ -1,3 +1,9 @@
+//Define number of elevator passengers
+let numPassengers = 100;
+
+//Define number of elevator floors/positions
+let numPositions = 12;  //-1,0,1-10
+
 class Elevator{
     constructor(name){
         this.name = name;   // should be A or B
@@ -84,4 +90,21 @@ class Elevator{
         }
 
     } 
+}
+
+class Passenger{
+    constructor(name){
+        this.name=name;
+        this.position=Math.floor(Math.random() * numPositions) - 1; // starting floor/position
+        this.isInElevator = null;   // null - at shaft floor, A - inside elevator A, B - inside elevator B
+    }
+}
+
+
+// Testing
+const passenger = [];
+
+for(let i=0;i<numPassengers;i++){
+    passenger.push(new Passenger(`passenger${i}`));
+    console.log(`${passenger[i].name} at position ${passenger[i].position}`);
 }
