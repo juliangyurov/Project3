@@ -1,8 +1,11 @@
 //Define number of elevator passengers
-let numPassengers = 100;
+const numPassengers = 100;
 
 //Define number of elevator floors/positions
-let numPositions = 12;  //-1,0,1-10
+const numPositions = 12;  //-1,0,1-10
+
+// Time ticks (1 tick = 1 sec)
+const timeTicks = 180;
 
 class Elevator{
     constructor(name){
@@ -19,6 +22,7 @@ class Elevator{
             this.maxFloor = 10;
             this.minFloor = 0;  // Elevator B: Goes all the way up (including 10) but does not go to the basement (-1)
         }
+        this.buttonLog = [timeTicks];   // every button status for every time tick recorded
     }
 
     //  Gets travel time between floors in seconds - 1 sec for each floor
@@ -81,6 +85,7 @@ class Elevator{
             openDoors();
         }
     }
+
     floorButton(){
 
     }
@@ -96,15 +101,25 @@ class Passenger{
     constructor(name){
         this.name=name;
         this.position=Math.floor(Math.random() * numPositions) - 1; // starting floor/position
-        this.isInElevator = null;   // null - at shaft floor, A - inside elevator A, B - inside elevator B
+        this.elevator = (Math.random() > 0.5)?"A":"B";  // // starting elevator position - A or B
+        this.isInElevator = false;   // inside elevator or not
+    }
+    pressButton(){
+
     }
 }
 
 
 // Testing
+const elevatorA = new Elevator("A");
+const elevatorB = new Elevator("B");
 const passenger = [];
+
 
 for(let i=0;i<numPassengers;i++){
     passenger.push(new Passenger(`passenger${i}`));
-    console.log(`${passenger[i].name} at position ${passenger[i].position}`);
+    console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position}`);
 }
+console.log(elevatorA);
+console.log(elevatorB);
+console.log(passenger);
