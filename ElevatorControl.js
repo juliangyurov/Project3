@@ -22,7 +22,6 @@ class Elevator{
             this.maxFloor = 10;
             this.minFloor = 0;  // Elevator B: Goes all the way up (including 10) but does not go to the basement (-1)
         }
-        this.buttonLog = [timeTicks];   // every button status for every time tick recorded
     }
 
     //  Gets travel time between floors in seconds - 1 sec for each floor
@@ -103,9 +102,17 @@ class Passenger{
         this.position=Math.floor(Math.random() * numPositions) - 1; // starting floor/position
         this.elevator = (Math.random() > 0.5)?"A":"B";  // // starting elevator position - A or B
         this.isInElevator = false;   // inside elevator or not
+        this.lastButton = null;
     }
     pressButton(){
-
+        if(this.position === -1){
+            this.lastButton = "up";
+        }
+        if(this.position === 10){
+            this.lastButton = "down";
+        }else{
+            this.lastButton = (Math.random() > 0.5)?"up":"down";
+        }
     }
 }
 
@@ -120,6 +127,15 @@ for(let i=0;i<numPassengers;i++){
     passenger.push(new Passenger(`passenger${i}`));
     console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position}`);
 }
-console.log(elevatorA);
-console.log(elevatorB);
-console.log(passenger);
+
+// console.log(elevatorA);
+// console.log(elevatorB);
+// console.log(passenger);
+
+do {
+
+
+}
+while(timeTicks > 0);
+
+
