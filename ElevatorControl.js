@@ -105,37 +105,87 @@ class Passenger{
         this.lastButton = null;
     }
     pressButton(){
-        if(this.position === -1){
-            this.lastButton = "up";
-        }
-        if(this.position === 10){
-            this.lastButton = "down";
-        }else{
-            this.lastButton = (Math.random() > 0.5)?"up":"down";
+        if(this.isInElevator === false){    // passenger is outside
+            if(this.position === -1){
+                this.lastButton = "up";
+            }else
+            if(this.position === 10){
+                this.lastButton = "down";
+            }else{
+                this.lastButton = (Math.random() > 0.5)?"up":"down";
+            }
+        }else{    // passenger is inside
+            if(this.elevator === "A"){  // passenger is inside A
+                let newFloorA = Math.floor(Math.random() * (numPositions-1)) - 1; //A -> from -1 to 9
+                while(this.position === newFloorA){      // avoid same position
+                    newFloorA = Math.floor(Math.random() * (numPositions-1)) - 1;
+                }
+                this.lastButton = newFloorA; 
+            }else{  // passenger is inside B
+                let newFloorB = Math.floor(Math.random() * (numPositions-1)); //B -> from 0 to 1
+                while(this.position === newFloorB){      // avoid same position
+                    newFloorB = Math.floor(Math.random() * (numPositions-1));
+                }
+                this.lastButton = newFloorB; 
+            }
         }
     }
 }
 
 
 // Testing
+// Create all elevators
 const elevatorA = new Elevator("A");
 const elevatorB = new Elevator("B");
+
+// Create all passengers
 const passenger = [];
-
-
 for(let i=0;i<numPassengers;i++){
     passenger.push(new Passenger(`passenger${i}`));
-    console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position}`);
+    //console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position}`);
 }
 
 // console.log(elevatorA);
 // console.log(elevatorB);
 // console.log(passenger);
 
-do {
-
-
+// All passengers pressed one of butons
+for(let i=0;i<numPassengers;i++){
+    passenger[i].pressButton();
+    //console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} pushed button ${passenger[i].lastButton}`);
 }
-while(timeTicks > 0);
+
+// Check for passengers and elevators on the same floor
+for(let i=0;i<numPassengers;i++){
+    if(passenger[i].position === elevatorA.position && passenger[i].elevator === "A"){
+        console.log("");
+        console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} pushed button ${passenger[i].lastButton}`);
+        elevatorA.openDoors();
+        passenger[i].isInElevator = true;
+        passenger[i].pressButton();
+        console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} pushed button ${passenger[i].lastButton}`);
+        elevatorA.closeDoors();
+    }
+}
+for(let i=0;i<numPassengers;i++){
+    if(passenger[i].position === elevatorB.position && passenger[i].elevator === "B"){
+        console.log("");
+        console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} pushed button ${passenger[i].lastButton}`);
+        elevatorB.openDoors();
+        passenger[i].isInElevator = true;
+        passenger[i].pressButton();
+        console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} pushed button ${passenger[i].lastButton}`);
+        elevatorB.closeDoors();
+    }
+}
+
+// do 
+// {
+
+
+
+//     timeTicks--;
+// }
+// while(timeTicks > 0);
 
 
