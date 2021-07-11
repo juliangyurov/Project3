@@ -1,11 +1,16 @@
 //Define number of elevator passengers
-const numPassengers = 100;
+const numPassengers = 4;
 
 //Define number of elevator floors/positions
 const numPositions = 12;  //-1,0,1-10
 
 // Time ticks (1 tick = 1 sec)
 const timeTicks = 180;
+
+// Maximal travel distance(time) from floor to floor
+const maxTravelTime = numPositions - 1;
+// Finding shortest travel
+let minTravelTime = maxTravelTime;
 
 class Elevator{
     constructor(name){
@@ -15,6 +20,7 @@ class Elevator{
         this.position = 0;  // floors -1,0,1,2,3,...,10
         this.startFloor = 0; // 
         this.destinationFloor = 0;  
+        this.noPassengers = true;   // there are no passengers in the elevator
         if(this.name === "A"){
             this.maxFloor = 9; // Elevator A: Goes to all floors except the penthouse (floor 10)
             this.minFloor = -1;
@@ -53,35 +59,36 @@ class Elevator{
     }
     moveUp(){
         if(this.position < maxFloor){
-            closeDoors();
+            this.closeDoors();
             this.position += 1;
             console.log(`Elevator-${this.name}: action: moving up to floor#${this.position}: OK`);
             if(this.destinationFloor === this.position){
-                openDoors();
+                this.openDoors();
             }
          }
     }
     moveDown(){
         if(this.position > minFloor){
-            closeDoors();
+            this.closeDoors();
             this.position -= 1;
             console.log(`Elevator-${this.name}: action: moving down to floor#${this.position}: OK`);
             if(this.destinationFloor === this.position){
-                openDoors();
+                this.openDoors();
             }
         }
     }
     move(floor){
+        var inFloor = floor; 
         if(floor === this.position){
-            console.log(`Elevator-${this.name}: action: move to floor#${floor}: already there, time: 0 sec`);
-            openDoors();
+            console.log(`Elevator-${this.name}: action: move to floor#${inFloor}: already there, time: 0 sec`);
+            this.openDoors();
         }else if(floor < -1 || floor >10){
-            console.log(`Elevator-${this.name} action: move to floor#${floor}: wrong floor number`);
+            console.log(`Elevator-${this.name} action: move to floor#${inFloor}: wrong floor number`);
         }else{
-            closeDoors();
-            console.log(`Elevator-${this.name}: action: move to floor#${floor}: OK, time: ${getTravelTime(this.position,floor)} sec`);
+            this.closeDoors();
+            console.log(`Elevator-${this.name}: action: move to floor#${inFloor}: OK, time: ${this.getTravelTime(this.position,floor)} sec`);
             this.position = floor;
-            openDoors();
+            this.openDoors();
         }
     }
 
@@ -142,7 +149,7 @@ const elevatorB = new Elevator("B");
 const passenger = [];
 for(let i=0;i<numPassengers;i++){
     passenger.push(new Passenger(`passenger${i}`));
-    //console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position}`);
+    console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position}`);
 }
 
 // console.log(elevatorA);
@@ -156,28 +163,73 @@ for(let i=0;i<numPassengers;i++){
 }
 
 // Check for passengers and elevators on the same floor
+elevatorA.noPassengers = true;
 for(let i=0;i<numPassengers;i++){
     if(passenger[i].position === elevatorA.position && passenger[i].elevator === "A"){
         console.log("");
         console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} pushed button ${passenger[i].lastButton}`);
         elevatorA.openDoors();
         passenger[i].isInElevator = true;
+        elevatorA.noPassengers = false;
         passenger[i].pressButton();
         console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} pushed button ${passenger[i].lastButton}`);
         elevatorA.closeDoors();
     }
 }
+elevatorB.noPassengers = true;
 for(let i=0;i<numPassengers;i++){
     if(passenger[i].position === elevatorB.position && passenger[i].elevator === "B"){
         console.log("");
         console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} pushed button ${passenger[i].lastButton}`);
         elevatorB.openDoors();
         passenger[i].isInElevator = true;
+        elevatorB.noPassengers = false;
         passenger[i].pressButton();
         console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} pushed button ${passenger[i].lastButton}`);
         elevatorB.closeDoors();
     }
 }
+
+// Check for "no passenger in elevator" status
+// Go to the nearest call request floor
+minTravelTime = maxTravelTime;
+if(elevatorA.noPassengers){
+    let nextDestinationA = elevatorA.position;
+    let travelTimeA = maxTravelTime;
+    for(let i=0;i<numPassengers;i++){
+        if(passenger[i].elevator === "A"){
+            travelTimeA = elevatorA.getTravelTime(elevatorA.position,passenger[i].position);
+            if(travelTimeA > 0 && travelTimeA < minTravelTime){
+                minTravelTime = travelTimeA;
+                nextDestinationA = passenger[i].position;
+            }
+        }
+    }
+    if(nextDestinationA !== elevatorA.position){
+        elevatorA.move(nextDestinationA);
+    }
+} 
+minTravelTime = maxTravelTime;
+if(elevatorB.noPassengers){
+    let nextDestinationB = elevatorB.position;
+    let travelTimeB = maxTravelTime;
+    for(let i=0;i<numPassengers;i++){
+        if(passenger[i].elevator === "B"){
+            travelTimeB = elevatorB.getTravelTime(elevatorB.position,passenger[i].position);
+            if(travelTimeB > 0 && travelTimeB < minTravelTime){
+                minTravelTime = travelTimeB;
+                nextDestinationB = passenger[i].position;
+            }
+        }
+    }
+    if(nextDestinationB !== elevatorB.position){
+        elevatorB.move(nextDestinationB);
+    }
+} 
+
+// Now with passengers inside elevators 
+// 
+
 
 // do 
 // {
