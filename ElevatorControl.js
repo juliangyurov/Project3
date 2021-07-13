@@ -21,6 +21,7 @@ class Elevator{
         this.startFloor = 0; // 
         this.destinationFloor = 0;  
         this.noPassengers = true;   // there are no passengers in the elevator
+
         if(this.name === "A"){
             this.maxFloor = 9; // Elevator A: Goes to all floors except the penthouse (floor 10)
             this.minFloor = -1;
@@ -28,7 +29,21 @@ class Elevator{
             this.maxFloor = 10;
             this.minFloor = 0;  // Elevator B: Goes all the way up (including 10) but does not go to the basement (-1)
         }
+        
+        this.shaftRequests = [];
+        this.elevatorRequests = [];
     }
+
+    shaftButton(button){
+        let shButton = {position: null, direction: null};
+        shButton.position = button.position;    // A: -1 - 9 , B: 0 - 10
+        shButton.direction = button.direction;  // "up" or "down"
+        this.shaftRequests.push(button);
+    }
+ 
+    elevatorButton(button){ // button:  A: -1 - 9 , B: 0 - 10 "Emergency", "Restart"
+        this.elevatorRequests.push(button);
+    }   
 
     //  Gets travel time between floors in seconds - 1 sec for each floor
     getTravelTime(fromFloor,toFloor){
@@ -83,7 +98,7 @@ class Elevator{
             console.log(`Elevator-${this.name}: action: move to floor#${inFloor}: already there, time: 0 sec`);
             this.openDoors();
         }else if(floor < -1 || floor >10){
-            console.log(`Elevator-${this.name} action: move to floor#${inFloor}: wrong floor number`);
+            console.log(`Elevator-${this.name} action: move to floor#${inFloor}: wrong floor number: ${inFloor}`);
         }else{
             this.closeDoors();
             console.log(`Elevator-${this.name}: action: move to floor#${inFloor}: OK, time: ${this.getTravelTime(this.position,floor)} sec`);
@@ -129,7 +144,7 @@ class Passenger{
                 }
                 this.lastButton = newFloorA; 
             }else{  // passenger is inside B
-                let newFloorB = Math.floor(Math.random() * (numPositions-1)); //B -> from 0 to 1
+                let newFloorB = Math.floor(Math.random() * (numPositions-1)); //B -> from 0 to 10
                 while(this.position === newFloorB){      // avoid same position
                     newFloorB = Math.floor(Math.random() * (numPositions-1));
                 }
