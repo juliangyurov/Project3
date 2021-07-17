@@ -34,17 +34,6 @@ class Elevator{
         this.elevatorRequests = [];
     }
 
-    shaftButton(button){
-        let shButton = {position: null, direction: null};
-        shButton.position = button.position;    // A: -1 - 9 , B: 0 - 10
-        shButton.direction = button.direction;  // "up" or "down"
-        this.shaftRequests.push(button);
-    }
- 
-    elevatorButton(button){ // button:  A: -1 - 9 , B: 0 - 10 "Emergency", "Restart"
-        this.elevatorRequests.push(button);
-    }   
-
     //  Gets travel time between floors in seconds - 1 sec for each floor
     getTravelTime(fromFloor,toFloor){
         if(fromFloor === toFloor){
@@ -106,16 +95,17 @@ class Elevator{
             this.openDoors();
         }
     }
-
-    floorButton(){
-
+    
+    shaftButton(button){
+        let shButton = {position: null, direction: null};
+        shButton.position = button.position;    // A: -1 - 9 , B: 0 - 10
+        shButton.direction = button.direction;  // "up" or "down"
+        this.shaftRequests.push(button);
     }
-    elevatorButton(buttonName){
-        if(buttonName === "Emergency"){
-
-        }
-
-    } 
+ 
+    elevatorButton(button){ // button:  A: -1 - 9 , B: 0 - 10 "Emergency", "Restart"
+        this.elevatorRequests.push(button);
+    }   
 }
 
 class Passenger{
@@ -160,12 +150,20 @@ class Passenger{
 const elevatorA = new Elevator("A");
 const elevatorB = new Elevator("B");
 
+//Testing elevators
+// elevatorA.shaftButton({position:-1,direction:"up"});
+// elevatorA.elevatorButton(3);
+// console.log(elevatorA.shaftRequests[0]);
+// console.log(elevatorA.elevatorRequests[0]);
+
 // Create all passengers
 const passenger = [];
 for(let i=0;i<numPassengers;i++){
     passenger.push(new Passenger(`passenger${i}`));
     console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position}`);
 }
+
+
 
 // console.log(elevatorA);
 // console.log(elevatorB);
@@ -175,72 +173,92 @@ for(let i=0;i<numPassengers;i++){
 for(let i=0;i<numPassengers;i++){
     passenger[i].pressButton();
     //console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} pushed button ${passenger[i].lastButton}`);
-}
-
-// Check for passengers and elevators on the same floor
-elevatorA.noPassengers = true;
-for(let i=0;i<numPassengers;i++){
-    if(passenger[i].position === elevatorA.position && passenger[i].elevator === "A"){
-        console.log("");
-        console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} pushed button ${passenger[i].lastButton}`);
-        elevatorA.openDoors();
-        passenger[i].isInElevator = true;
-        elevatorA.noPassengers = false;
-        passenger[i].pressButton();
-        console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} pushed button ${passenger[i].lastButton}`);
-        elevatorA.closeDoors();
-    }
-}
-elevatorB.noPassengers = true;
-for(let i=0;i<numPassengers;i++){
-    if(passenger[i].position === elevatorB.position && passenger[i].elevator === "B"){
-        console.log("");
-        console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} pushed button ${passenger[i].lastButton}`);
-        elevatorB.openDoors();
-        passenger[i].isInElevator = true;
-        elevatorB.noPassengers = false;
-        passenger[i].pressButton();
-        console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} pushed button ${passenger[i].lastButton}`);
-        elevatorB.closeDoors();
-    }
-}
-
-// Check for "no passenger in elevator" status
-// Go to the nearest call request floor
-minTravelTime = maxTravelTime;
-if(elevatorA.noPassengers){
-    let nextDestinationA = elevatorA.position;
-    let travelTimeA = maxTravelTime;
-    for(let i=0;i<numPassengers;i++){
+    if(passenger[i].isInElevator){
         if(passenger[i].elevator === "A"){
-            travelTimeA = elevatorA.getTravelTime(elevatorA.position,passenger[i].position);
-            if(travelTimeA > 0 && travelTimeA < minTravelTime){
-                minTravelTime = travelTimeA;
-                nextDestinationA = passenger[i].position;
-            }
+            elevatorA.elevatorButton(passenger[i].lastButton);
+        }else{
+            elevatorB.elevatorButton(passenger[i].lastButton);
+        }
+    }else{  // outside elevator 
+        if(passenger[i].elevator === "A"){
+            elevatorA.shaftButton({position:passenger[i].position,direction:passenger[i].lastButton});
+        }else{
+            elevatorB.shaftButton({position:passenger[i].position,direction:passenger[i].lastButton});
         }
     }
-    if(nextDestinationA !== elevatorA.position){
-        elevatorA.move(nextDestinationA);
-    }
-} 
-minTravelTime = maxTravelTime;
-if(elevatorB.noPassengers){
-    let nextDestinationB = elevatorB.position;
-    let travelTimeB = maxTravelTime;
-    for(let i=0;i<numPassengers;i++){
-        if(passenger[i].elevator === "B"){
-            travelTimeB = elevatorB.getTravelTime(elevatorB.position,passenger[i].position);
-            if(travelTimeB > 0 && travelTimeB < minTravelTime){
-                minTravelTime = travelTimeB;
-                nextDestinationB = passenger[i].position;
-            }
-        }
-    }
-    if(nextDestinationB !== elevatorB.position){
-        elevatorB.move(nextDestinationB);
-    }
-} 
+}
+
+console.log("elevator A: requests");
+console.log(elevatorA.shaftRequests);
+console.log(elevatorA.elevatorRequests);
+console.log("elevator B: requests");
+console.log(elevatorB.shaftRequests);
+console.log(elevatorB.elevatorRequests);
+
+// // Check for passengers and elevators on the same floor
+// elevatorA.noPassengers = true;
+// for(let i=0;i<numPassengers;i++){
+//     if(passenger[i].position === elevatorA.position && passenger[i].elevator === "A"){
+//         console.log("");
+//         console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} pushed button ${passenger[i].lastButton}`);
+//         elevatorA.openDoors();
+//         passenger[i].isInElevator = true;
+//         elevatorA.noPassengers = false;
+//         passenger[i].pressButton();
+//         console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} pushed button ${passenger[i].lastButton}`);
+//         elevatorA.closeDoors();
+//     }
+// }
+// elevatorB.noPassengers = true;
+// for(let i=0;i<numPassengers;i++){
+//     if(passenger[i].position === elevatorB.position && passenger[i].elevator === "B"){
+//         console.log("");
+//         console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} pushed button ${passenger[i].lastButton}`);
+//         elevatorB.openDoors();
+//         passenger[i].isInElevator = true;
+//         elevatorB.noPassengers = false;
+//         passenger[i].pressButton();
+//         console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} pushed button ${passenger[i].lastButton}`);
+//         elevatorB.closeDoors();
+//     }
+// }
+
+// // Check for "no passenger in elevator" status
+// // Go to the nearest call request floor
+// minTravelTime = maxTravelTime;
+// if(elevatorA.noPassengers){
+//     let nextDestinationA = elevatorA.position;
+//     let travelTimeA = maxTravelTime;
+//     for(let i=0;i<numPassengers;i++){
+//         if(passenger[i].elevator === "A"){
+//             travelTimeA = elevatorA.getTravelTime(elevatorA.position,passenger[i].position);
+//             if(travelTimeA > 0 && travelTimeA < minTravelTime){
+//                 minTravelTime = travelTimeA;
+//                 nextDestinationA = passenger[i].position;
+//             }
+//         }
+//     }
+//     if(nextDestinationA !== elevatorA.position){
+//         elevatorA.move(nextDestinationA);
+//     }
+// } 
+// minTravelTime = maxTravelTime;
+// if(elevatorB.noPassengers){
+//     let nextDestinationB = elevatorB.position;
+//     let travelTimeB = maxTravelTime;
+//     for(let i=0;i<numPassengers;i++){
+//         if(passenger[i].elevator === "B"){
+//             travelTimeB = elevatorB.getTravelTime(elevatorB.position,passenger[i].position);
+//             if(travelTimeB > 0 && travelTimeB < minTravelTime){
+//                 minTravelTime = travelTimeB;
+//                 nextDestinationB = passenger[i].position;
+//             }
+//         }
+//     }
+//     if(nextDestinationB !== elevatorB.position){
+//         elevatorB.move(nextDestinationB);
+//     }
+// } 
 
 // Now with passengers inside elevators 
 // 
