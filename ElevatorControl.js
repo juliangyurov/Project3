@@ -16,10 +16,11 @@ class Elevator{
     constructor(name){
         this.name = name;   // should be A or B
         this.doorsOpened = false;
-        this.mooving = false;
+        this.moving = false;
         this.position = 0;  // floors -1,0,1,2,3,...,10
         this.startFloor = 0; // 
-        this.destinationFloor = 0;  
+        this.destinationFloor = 0; 
+        this.direction = null;  // "up", "down" or null
         this.noPassengers = true;   // there are no passengers in the elevator
 
         if(this.name === "A"){
@@ -62,7 +63,7 @@ class Elevator{
         }
     }
     moveUp(){
-        if(this.position < maxFloor){
+        if(this.position < this.maxFloor){
             this.closeDoors();
             this.position += 1;
             console.log(`Elevator-${this.name}: action: moving up to floor#${this.position}: OK`);
@@ -72,7 +73,7 @@ class Elevator{
          }
     }
     moveDown(){
-        if(this.position > minFloor){
+        if(this.position > this.minFloor){
             this.closeDoors();
             this.position -= 1;
             console.log(`Elevator-${this.name}: action: moving down to floor#${this.position}: OK`);
@@ -106,6 +107,43 @@ class Elevator{
     elevatorButton(button){ // button:  A: -1 - 9 , B: 0 - 10 "Emergency", "Restart"
         this.elevatorRequests.push(button);
     }   
+
+    // Counts requests button and desides direction "Up" or "Down" 
+    checkRequests(){
+        let nextDirection = "err";
+        let upCount = 0;
+        let downCount = 0;
+        if(this.position === -1){
+            nextDirection = "up";
+            console.log(`Elevator ${this.name} position: ${this.position} --> ${nextDirection}`);
+            return nextDirection;
+        }
+        if(this.position === 10){
+            nextDirection = "down";
+            console.log(`Elevator ${this.name} position: ${this.position} --> ${nextDirection}`);
+            return nextDirection;
+        }
+        // elevator position is from 0 to 9
+        for(let i = 0;i < this.shaftRequests.length;i++){
+            if(this.position < this.shaftRequests[i].position){
+                upCount++;
+            }
+            if(this.position > this.shaftRequests[i].position){
+                downCount++;
+            }            
+        }
+        for(let i = 0;i < this.elevatorRequests.length;i++){
+            if(this.position < this.elevatorRequests[i]){
+                upCount++;
+            }
+            if(this.position > this.elevatorRequests[i]){
+                downCount++;
+            }            
+        }
+        nextDirection = (upCount >= downCount)?"up":"down"
+        console.log(`Elevator ${this.name} position: ${this.position} upCount: ${upCount}, downCount: ${downCount} --> ${nextDirection}`);
+        return nextDirection;
+    }
 }
 
 class Passenger{
@@ -195,33 +233,51 @@ console.log("elevator B: requests");
 console.log(elevatorB.shaftRequests);
 console.log(elevatorB.elevatorRequests);
 
-// // Check for passengers and elevators on the same floor
-// elevatorA.noPassengers = true;
-// for(let i=0;i<numPassengers;i++){
-//     if(passenger[i].position === elevatorA.position && passenger[i].elevator === "A"){
-//         console.log("");
-//         console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} pushed button ${passenger[i].lastButton}`);
-//         elevatorA.openDoors();
-//         passenger[i].isInElevator = true;
-//         elevatorA.noPassengers = false;
-//         passenger[i].pressButton();
-//         console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} pushed button ${passenger[i].lastButton}`);
-//         elevatorA.closeDoors();
-//     }
-// }
-// elevatorB.noPassengers = true;
-// for(let i=0;i<numPassengers;i++){
-//     if(passenger[i].position === elevatorB.position && passenger[i].elevator === "B"){
-//         console.log("");
-//         console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} pushed button ${passenger[i].lastButton}`);
-//         elevatorB.openDoors();
-//         passenger[i].isInElevator = true;
-//         elevatorB.noPassengers = false;
-//         passenger[i].pressButton();
-//         console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} pushed button ${passenger[i].lastButton}`);
-//         elevatorB.closeDoors();
-//     }
-// }
+// Elevator dispatcher here
+
+//  Check for passengers and elevators on the same floor and elevator is stopped or same direction
+
+//elevatorA.noPassengers = true;
+for(let i=0;i<numPassengers;i++){
+    if(passenger[i].position === elevatorA.position && passenger[i].elevator === "A" && 
+        (elevatorA.direction === passenger[i].lastButton ||  elevatorA.direction === null) ){
+        console.log("");
+        console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} pushed button ${passenger[i].lastButton}`);
+        elevatorA.openDoors();
+        passenger[i].isInElevator = true;
+        elevatorA.noPassengers = false;
+        //passenger[i].pressButton();
+        console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} `);
+        elevatorA.closeDoors();
+    }
+}
+//elevatorB.noPassengers = true;
+for(let i=0;i<numPassengers;i++){
+    if(passenger[i].position === elevatorB.position && passenger[i].elevator === "B" && 
+        (elevatorB.direction === passenger[i].lastButton ||  elevatorB.direction === null) ){
+        console.log("");
+        console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} pushed button ${passenger[i].lastButton}`);
+        elevatorB.openDoors();
+        passenger[i].isInElevator = true;
+        elevatorB.noPassengers = false;
+        //passenger[i].pressButton();
+        console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position}`);
+        elevatorB.closeDoors();
+    }
+}
+
+if(elevatorA.checkRequests() === "up"){
+    elevatorA.moveUp();
+}
+if(elevatorA.checkRequests() === "down"){
+    elevatorA.moveDown();
+}  
+if(elevatorB.checkRequests() === "up"){
+    elevatorB.moveUp();
+}
+if(elevatorB.checkRequests() === "down"){
+    elevatorB.moveDown();
+}  
 
 // // Check for "no passenger in elevator" status
 // // Go to the nearest call request floor
