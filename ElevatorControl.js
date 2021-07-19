@@ -160,6 +160,17 @@ class Elevator{
             }
         }
     }
+
+    // Update/delete old requests
+    updateElevatorRequests(){
+        console.log(`updateElevatorRequests: ${this.elevatorRequests.length}`);
+        for(let i = 0;i < this.elevatorRequests.length;i++){
+            if(this.position === this.elevatorRequests[i]){
+                this.elevatorRequests.splice(i,1);
+                console.log(`updateElevatorRequests: ${this.elevatorRequests.length}`);
+            }
+        }
+    }
 }
 
 class Passenger{
@@ -226,19 +237,21 @@ while(timeTicks>0){
 
 // All passengers pressed one of butons
 for(let i=0;i<numPassengers;i++){
-    passenger[i].pressButton();
-    //console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} pushed button ${passenger[i].lastButton}`);
-    if(passenger[i].isInElevator){
-        if(passenger[i].elevator === "A"){
-            elevatorA.elevatorButton(passenger[i].lastButton);
-        }else{
-            elevatorB.elevatorButton(passenger[i].lastButton);
-        }
-    }else{  // outside elevator 
-        if(passenger[i].elevator === "A"){
-            elevatorA.shaftButton({position:passenger[i].position,direction:passenger[i].lastButton});
-        }else{
-            elevatorB.shaftButton({position:passenger[i].position,direction:passenger[i].lastButton});
+    if(passenger[i].lastButton === null){   // permits only passenger[i] one time press before completion of request
+        passenger[i].pressButton();
+        //console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} pushed button ${passenger[i].lastButton}`);
+        if(passenger[i].isInElevator){
+            if(passenger[i].elevator === "A"){
+                elevatorA.elevatorButton(passenger[i].lastButton);
+            }else{
+                elevatorB.elevatorButton(passenger[i].lastButton);
+            }
+        }else{  // outside elevator 
+            if(passenger[i].elevator === "A"){
+                elevatorA.shaftButton({position:passenger[i].position,direction:passenger[i].lastButton});
+            }else{
+                elevatorB.shaftButton({position:passenger[i].position,direction:passenger[i].lastButton});
+            }
         }
     }
 }
@@ -252,19 +265,29 @@ for(let i=0;i<numPassengers;i++){
 
 // Elevator dispatcher here
 
-//  Check for passengers and elevators on the same floor and elevator is stopped or same direction
+//  Check for waiting after "up" or "down" button passengers and elevators on the same floor and elevator is stopped or same direction
 
 //elevatorA.noPassengers = true;
 for(let i=0;i<numPassengers;i++){
     if(passenger[i].position === elevatorA.position && passenger[i].elevator === "A" && 
         (elevatorA.direction === passenger[i].lastButton ||  elevatorA.direction === null) ){
-        console.log("");
+        console.log("--------------------------------------------------------------------------------------------");
         console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} pushed button ${passenger[i].lastButton}`);
         elevatorA.openDoors();
         passenger[i].isInElevator = true;
         elevatorA.noPassengers = false;
         elevatorA.updateShaftRequests();    // delete same floor requests
-        //passenger[i].pressButton();
+        passenger[i].lastButton = null;     // delete old request for elevator
+        console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} `);
+        elevatorA.closeDoors();
+    }else if(passenger[i].isInElevator && passenger[i].lastButton === elevatorA.position){  // Check for arrival to destination floor
+        console.log("--------------------------------------------------------------------------------------------");
+        console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} arrived at floor ${passenger[i].lastButton}`);
+        elevatorA.openDoors();
+        passenger[i].isInElevator = false;
+        passenger[i].position = elevatorA.position;
+        elevatorA.updateElevatorRequests();    // delete same floor requests
+        passenger[i].lastButton = null;     // delete old request from inside elevator
         console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} `);
         elevatorA.closeDoors();
     }
@@ -273,30 +296,40 @@ for(let i=0;i<numPassengers;i++){
 for(let i=0;i<numPassengers;i++){
     if(passenger[i].position === elevatorB.position && passenger[i].elevator === "B" && 
         (elevatorB.direction === passenger[i].lastButton ||  elevatorB.direction === null) ){
-        console.log("");
+        console.log("---------------------------------------------------------------------------------------------");
         console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} pushed button ${passenger[i].lastButton}`);
         elevatorB.openDoors();
         passenger[i].isInElevator = true;
         elevatorB.noPassengers = false;
         elevatorB.updateShaftRequests();    // delete same floor requests
-        //passenger[i].pressButton();
+        passenger[i].lastButton = null;     // delete old request for elevator
         console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position}`);
+        elevatorB.closeDoors();
+    }else if(passenger[i].isInElevator && passenger[i].lastButton === elevatorB.position){// Check for arrival to destination floor
+        console.log("--------------------------------------------------------------------------------------------");
+        console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} arrived at floor ${passenger[i].lastButton}`);
+        elevatorB.openDoors();
+        passenger[i].isInElevator = false;
+        passenger[i].position = elevatorB.position;
+        elevatorB.updateElevatorRequests();    // delete same floor requests
+        passenger[i].lastButton = null;     // delete old request from inside elevator
+        console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} `);
         elevatorB.closeDoors();
     }
 }
 
-// All passengers inside elevator pressed one of butons
-for(let i=0;i<numPassengers;i++){
-    //console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} pushed button ${passenger[i].lastButton}`);
-    if(passenger[i].isInElevator){
-        passenger[i].pressButton();
-        if(passenger[i].elevator === "A"){
-            elevatorA.elevatorButton(passenger[i].lastButton);
-        }else{
-            elevatorB.elevatorButton(passenger[i].lastButton);
-        }
-    }
-}
+// // All passengers inside elevator pressed one of butons
+// for(let i=0;i<numPassengers;i++){
+//     //console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} pushed button ${passenger[i].lastButton}`);
+//     if(passenger[i].isInElevator){
+//         passenger[i].pressButton();
+//         if(passenger[i].elevator === "A"){
+//             elevatorA.elevatorButton(passenger[i].lastButton);
+//         }else{
+//             elevatorB.elevatorButton(passenger[i].lastButton);
+//         }
+//     }
+// }
 
 console.log("elevator A: shaftRequests");
 console.log(elevatorA.shaftRequests);
