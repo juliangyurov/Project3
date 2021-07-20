@@ -6,7 +6,7 @@ const numPositions = 12;  //-1,0,1-10
 
 // Time ticks (1 tick = 1 sec)
 //let timeTicks = 180;
-let timeTicks = 3;
+let timeTicks = 12;
 
 // Maximal travel distance(time) from floor to floor
 const maxTravelTime = numPositions - 1;
@@ -157,6 +157,7 @@ class Elevator{
             if(this.position === this.shaftRequests[i].position){
                 this.shaftRequests.splice(i,1);
                 console.log(`updateShaftRequests: ${this.shaftRequests.length}`);
+                break;
             }
         }
     }
@@ -168,6 +169,7 @@ class Elevator{
             if(this.position === this.elevatorRequests[i]){
                 this.elevatorRequests.splice(i,1);
                 console.log(`updateElevatorRequests: ${this.elevatorRequests.length}`);
+                break;
             }
         }
     }
@@ -239,7 +241,7 @@ while(timeTicks>0){
 for(let i=0;i<numPassengers;i++){
     if(passenger[i].lastButton === null){   // permits only passenger[i] one time press before completion of request
         passenger[i].pressButton();
-        //console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} pushed button ${passenger[i].lastButton}`);
+        console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} position ${passenger[i].position} pushed button ${passenger[i].lastButton}`);
         if(passenger[i].isInElevator){
             if(passenger[i].elevator === "A"){
                 elevatorA.elevatorButton(passenger[i].lastButton);
