@@ -225,11 +225,13 @@ const elevatorB = new Elevator("B");
 // console.log(elevatorA.elevatorRequests[0]);
 
 // Create all passengers
+console.log("Create all passengers");
 const passenger = [];
 for(let i=0;i<numPassengers;i++){
     passenger.push(new Passenger(`passenger${i}`));
     console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position}`);
 }
+console.log(".");
 
 // console.log(elevatorA);
 // console.log(elevatorB);
@@ -239,6 +241,7 @@ for(let i=0;i<numPassengers;i++){
 while(timeTicks>0){
 
 // All passengers pressed one of butons
+console.log("All passengers pressed one of butons");
 for(let i=0;i<numPassengers;i++){
     if(passenger[i].lastButton === null){   // permits only passenger[i] one time press before completion of request
         passenger[i].pressButton();
@@ -258,6 +261,7 @@ for(let i=0;i<numPassengers;i++){
         }
     }
 }
+console.log(".");
 
 // console.log("elevator A: requests");
 // console.log(elevatorA.shaftRequests);
@@ -363,6 +367,7 @@ if(elevatorBDirection === "up"){
 if(elevatorBDirection === "down"){
     elevatorB.moveDown();
 }  
+console.log(".");
 
 timeTicks--;
 };  // End of while
