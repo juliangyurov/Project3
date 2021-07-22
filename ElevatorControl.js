@@ -70,6 +70,7 @@ class Elevator{
     moveUp(){
         if(this.position < this.maxFloor){
             this.closeDoors();
+            this.direction = "up";
             this.position += 1;
             console.log(`Elevator ${this.name}: action: moving up to floor#${this.position}: OK`);
             // if(this.destinationFloor === this.position){
@@ -80,6 +81,7 @@ class Elevator{
     moveDown(){
         if(this.position > this.minFloor){
             this.closeDoors();
+            this.direction = "down";
             this.position -= 1;
             console.log(`Elevator ${this.name}: action: moving down to floor#${this.position}: OK`);
             // if(this.destinationFloor === this.position){
@@ -132,7 +134,7 @@ class Elevator{
         // elevator position is from 0 to 9
 
         if(this.elevatorRequests.length > 0){
-            nextDirection = (this.position < this.elevatorRequests[0])?"up":"down";
+            nextDirection = (this.position < this.elevatorRequests[0])?"up": ((this.position > this.elevatorRequests[0])?"down":"no requests");
             console.log(`Elevator ${this.name} position: ${this.position} Elevator request: --> ${nextDirection}`);
             return nextDirection;
         }
@@ -283,7 +285,7 @@ for(let i=0;i<numPassengers;i++){
         elevatorA.openDoors();
         passenger[i].isInElevator = true;
         elevatorA.noPassengers = false;
-        elevatorA.updateShaftRequests();    // delete same floor requests
+        elevatorA.updateShaftRequests();    // delete same floor request
         passenger[i].lastButton = null;     // delete old request for elevator
         console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} `);
         //elevatorA.closeDoors();
@@ -293,7 +295,7 @@ for(let i=0;i<numPassengers;i++){
         elevatorA.openDoors();
         passenger[i].isInElevator = false;
         passenger[i].position = elevatorA.position;
-        elevatorA.updateElevatorRequests();    // delete same floor requests
+        elevatorA.updateElevatorRequests();    // delete same floor request
         passenger[i].lastButton = null;     // delete old request from inside elevator
         console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} `);
         //elevatorA.closeDoors();
@@ -359,6 +361,8 @@ if(elevatorADirection === "up"){
 }else 
 if(elevatorADirection === "down"){
     elevatorA.moveDown();
+}else{
+    elevatorA.direction = null;
 }  
 
 if(elevatorBDirection === "up"){
@@ -366,7 +370,9 @@ if(elevatorBDirection === "up"){
 }else
 if(elevatorBDirection === "down"){
     elevatorB.moveDown();
-}  
+}else{
+    elevatorB.direction = null;
+}    
 console.log(".");
 
 timeTicks--;
