@@ -7,7 +7,7 @@ const numPositions = 12;  //-1,0,1-10
 
 // Time ticks (1 tick = 1 sec)
 //let timeTicks = 180;
-let timeTicks = 17;
+let timeTicks = 37;
 
 // Maximal travel distance(time) from floor to floor
 const maxTravelTime = numPositions - 1;
@@ -120,18 +120,18 @@ class Elevator{
         let nextDirection = "no requests";
         let upCount = 0;
         let downCount = 0;
-        if(this.position === -1){
-            nextDirection = "up";
-            console.log(`Elevator ${this.name} position: ${this.position} --> ${nextDirection}`);
-            return nextDirection;
-        }
-        if(this.position === 10){
-            nextDirection = "down";
-            console.log(`Elevator ${this.name} position: ${this.position} --> ${nextDirection}`);
-            return nextDirection;
-        }
+        // if(this.position === -1){
+        //     nextDirection = "up";
+        //     console.log(`Elevator ${this.name} position: ${this.position} --> ${nextDirection}`);
+        //     return nextDirection;
+        // }
+        // if(this.position === 10){
+        //     nextDirection = "down";
+        //     console.log(`Elevator ${this.name} position: ${this.position} --> ${nextDirection}`);
+        //     return nextDirection;
+        // }
 
-        // elevator position is from 0 to 9
+        // elevator position is from -1 to 10
 
         if(this.elevatorRequests.length > 0){
             nextDirection = (this.position < this.elevatorRequests[0])?"up": ((this.position > this.elevatorRequests[0])?"down":"no requests");
@@ -278,8 +278,8 @@ console.log(".");
 
 //elevatorA.noPassengers = true;
 for(let i=0;i<numPassengers;i++){
-    if(passenger[i].position === elevatorA.position && passenger[i].elevator === "A" && 
-        (elevatorA.direction === passenger[i].lastButton ||  elevatorA.direction === null) ){
+    if(passenger[i].position === elevatorA.position && passenger[i].elevator === "A" && passenger[i].isInElevator === false ){
+        //(elevatorA.direction === passenger[i].lastButton ||  elevatorA.direction === null) ){
         console.log("--------------------------------------------------------------------------------------------");
         console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} pushed button ${passenger[i].lastButton}`);
         elevatorA.openDoors();
@@ -305,8 +305,8 @@ elevatorA.closeDoors();
 
 //elevatorB.noPassengers = true;
 for(let i=0;i<numPassengers;i++){
-    if(passenger[i].position === elevatorB.position && passenger[i].elevator === "B" && 
-        (elevatorB.direction === passenger[i].lastButton ||  elevatorB.direction === null) ){
+    if(passenger[i].position === elevatorB.position && passenger[i].elevator === "B" && passenger[i].isInElevator === false ){
+       // (elevatorB.direction === passenger[i].lastButton ||  elevatorB.direction === null) ){
         console.log("---------------------------------------------------------------------------------------------");
         console.log(`${passenger[i].name} ${passenger[i].isInElevator?"inside":"outside"} elevator ${passenger[i].elevator} on the floor ${passenger[i].position} pushed button ${passenger[i].lastButton}`);
         elevatorB.openDoors();
@@ -343,14 +343,25 @@ elevatorB.closeDoors();
 //     }
 // }
 
-console.log("elevator A: shaftRequests");
-console.log(elevatorA.shaftRequests);
-console.log("elevator A: elevatorRequests");
-console.log(elevatorA.elevatorRequests);
-console.log("elevator B: shaftRequests");
-console.log(elevatorB.shaftRequests);
-console.log("elevator B: elevatorRequests");
-console.log(elevatorB.elevatorRequests);
+if(elevatorA.shaftRequests.length > 0){
+    console.log("elevator A: shaftRequests");
+    console.log(elevatorA.shaftRequests);
+}
+
+if(elevatorA.elevatorRequests.length > 0){
+    console.log("elevator A: elevatorRequests");
+    console.log(elevatorA.elevatorRequests);
+}
+
+if(elevatorB.shaftRequests.length > 0){
+    console.log("elevator B: shaftRequests");
+    console.log(elevatorB.shaftRequests);
+}
+
+if(elevatorB.elevatorRequests.length > 0){
+    console.log("elevator B: elevatorRequests");
+    console.log(elevatorB.elevatorRequests);
+}
 
 
 elevatorADirection = elevatorA.checkRequests();
