@@ -78,13 +78,13 @@ class Elevator{
     openDoors(){
         if(this.doorsOpened === false){
             this.doorsOpened = true;
-            //console.log(`Elevator ${this.name}: action:  Open doors`);
+            console.log(`Elevator ${this.name}: action:  Open doors`);
         }
      }
     closeDoors(){
         if(this.doorsOpened === true){
             this.doorsOpened = false;
-            //console.log(`Elevator ${this.name}: action:  Close doors`);
+            console.log(`Elevator ${this.name}: action:  Close doors`);
         }
     }
     moveUp(){
