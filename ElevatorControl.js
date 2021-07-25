@@ -14,8 +14,8 @@
  
 
 //Define number of elevator passengers
-//const numPassengers = 100;
-const numPassengers = 4;
+const numPassengers = 100;
+//const numPassengers = 4;
 
 // Max transfers for passenger from floor to floor
 const maxTransfers = 1;
@@ -24,10 +24,10 @@ const maxTransfers = 1;
 const numPositions = 12;  //-1,0,1-10
 
 // Time ticks (1 tick = 1 sec)
-//const maxTimeTicks = 180;
-//let timeTicks = maxTimeTicks;
-const maxTimeTicks = 37;
+const maxTimeTicks = 180;
 let timeTicks = maxTimeTicks;
+//const maxTimeTicks = 37;
+//let timeTicks = maxTimeTicks;
 
 // Maximal travel distance(time) from floor to floor
 const maxTravelTime = numPositions - 1;
